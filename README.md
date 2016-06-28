@@ -1,19 +1,7 @@
-# untitled
+# Elements
 
-A library for Dart developers. It is awesome.
+A collection of custom elements
 
 ## Usage
 
-A simple usage example:
-
-    import 'package:untitled/untitled.dart';
-
-    main() {
-      var awesome = new Awesome();
-    }
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
+Important notice: this package is in early alpha.

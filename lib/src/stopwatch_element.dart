@@ -1,12 +1,10 @@
 // Copyright (c) 2016, Patrick Minogue. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-library Stopwatch;
 
 import 'dart:async';
 import 'dart:html';
 import 'dart:math';
-import 'element_base.dart';
 
 final double HALF_PI = 0.5 * PI;
 final double DOUBLE_PI = 2 * PI;
@@ -14,7 +12,7 @@ final double DOUBLE_PI = 2 * PI;
 // An analog stopwatch
 // param int duration: timeout duration in milliseconds, must be dividable by 4
 // param DivElement container: Html container which will hold the stopwatch
-class StopwatchElement extends afElement
+class StopwatchElement
 {
   StopwatchElement(this._duration, this._container, { Duration delay, Function onDone : null, bool ccw : false })
   {

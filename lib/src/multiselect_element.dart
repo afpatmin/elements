@@ -5,11 +5,10 @@
  * \brief Multiple select
  */
 import 'dart:html';
-import 'element_base.dart';
 
 typedef void onChangeCallback(String value);
 
-class MultiSelectElement extends afElement
+class MultiSelectElement
 {
   MultiSelectElement(List<String> options, {List<String> values : null, bool required : false, int max : -1, Element container : null, onChangeCallback onChange : null}) : super()
   {
@@ -18,12 +17,18 @@ class MultiSelectElement extends afElement
     _max = max;
     _onChange = onChange;
     _root = new DivElement();
-    _root.className = "multi-select";
+    _root.className = "row collapse multi-select";
     _selectedOptionsContainer = new DivElement();
+    _selectedOptionsContainer.className = "columns multi-select-selected-container";
+
+    DivElement selectorCol = new DivElement();
+    DivElement addButtonCol = new DivElement();
+    selectorCol.className = "medium-10 columns";
+    addButtonCol.className = "medium-2 columns";
     _options = new SelectElement();
-    _addElement = new DivElement();
+    _addElement = new SpanElement();
+    _addElement.className = "postfix clickable no-select";
     _addElement.setInnerHtml("Add");
-    _addElement.className = "add-button no-select";
     _addElement.onClick.listen(_addSelected);
 
     if (options != null)
@@ -37,8 +42,11 @@ class MultiSelectElement extends afElement
         }
       }
     }
-    _root.append(_options);
-    _root.append(_addElement);
+
+    selectorCol.append(_options);
+    addButtonCol.append(_addElement);
+    _root.append(selectorCol);
+    _root.append(addButtonCol);
     _root.append(_selectedOptionsContainer);
     if (container != null) container.children.add(_root);
     _options.setCustomValidity("");
@@ -73,6 +81,11 @@ class MultiSelectElement extends afElement
     options = validValues.join(",, ");
   }
 
+  void focus()
+  {
+    _options.focus();
+  }
+
   Map<String, String> get pairs
   {
     Map<String, String> dataSet = new Map();
@@ -80,7 +93,7 @@ class MultiSelectElement extends afElement
     return dataSet;
   }
 
-  void _addToSelected(String option)
+  void _addToSelected(String option, [bool trigger_on_change = true])
   {
     if (_max >= 0 && _selectedOptionsContainer.children.length >= _max) return;
     DivElement addedOption = new DivElement();
@@ -99,11 +112,12 @@ class MultiSelectElement extends afElement
     addedOption.children.add(close);
     _selectedOptionsContainer.append(addedOption);
     _options.setCustomValidity("");
-    if (_onChange != null) _onChange(value);
+    if (_onChange != null && trigger_on_change) _onChange(value);
   }
 
   void _addSelected([Event e = null])
   {
+    if (_options.disabled) return;
     if (_max >= 0 && _selectedOptionsContainer.children.length >= _max) return;
     if (_options.selectedIndex < 0) return;
     DivElement addedOption = new DivElement();
@@ -128,17 +142,20 @@ class MultiSelectElement extends afElement
   /// un-selects the option and returns it to the select list
   void _unSelect(DivElement addedOption)
   {
-    OptionElement option = new OptionElement();
-    option.innerHtml = addedOption.children.first.innerHtml;
-    option.value = addedOption.dataset["value"];
-    _options.children.add(option);
-    _selectedOptionsContainer.children.remove(addedOption);
-    if (_selectedOptionsContainer.children.isEmpty)
+    if (!_disabled)
     {
-      _options.setCustomValidity("");
-      _options.setCustomValidity("input_valid_multiselect");
+      OptionElement option = new OptionElement();
+      option.innerHtml = addedOption.children.first.innerHtml;
+      option.value = addedOption.dataset["value"];
+      _options.children.add(option);
+      _selectedOptionsContainer.children.remove(addedOption);
+      if (_selectedOptionsContainer.children.isEmpty)
+      {
+        _options.setCustomValidity("");
+        _options.setCustomValidity("input_valid_multiselect");
+      }
+      if (_onChange != null) _onChange(value);
     }
-    if (_onChange != null) _onChange(value);
   }
 
   /// unSelect all options
@@ -158,7 +175,7 @@ class MultiSelectElement extends afElement
 
   bool get valid => !(_required && _selectedOptionsContainer.children.isEmpty);
 
-  /// Comma separated string
+  /// Comma separated string (",, ")
   String get value
   {
     String values = "";
@@ -193,6 +210,12 @@ class MultiSelectElement extends afElement
   /// Set selected options based on value, comma separated string
   set value(String values_css)
   {
+    if (values_css == null || values_css.isEmpty)
+    {
+      options = "";
+      return;
+    }
+
     List<String> valueList = values_css.split(",, ");
     List<String> nameList = new List();
     valueList.forEach((String value) => nameList.add(nameOf(value)));
@@ -214,18 +237,18 @@ class MultiSelectElement extends afElement
           {
             try
             {
-              _addToSelected(value);
+              _addToSelected(value, false);
             }
             on StateError
             {
-              print(value);
+              print("multiselect error, missing value: $value");
             }
           });
         }
-        else if (options_css != "") _addToSelected(options_css);
+        else if (options_css != "") _addToSelected(options_css, false);
       }
+      if (_onChange != null) _onChange(value);
     }
-    if (_onChange != null) _onChange(value);
   }
 
   get required => _required;
@@ -249,7 +272,7 @@ class MultiSelectElement extends afElement
   bool _required = false;
   bool _disabled = false;
   SelectElement _options;
-  DivElement _addElement;
+  SpanElement _addElement;
   DivElement _selectedOptionsContainer;
   DivElement _root;
   int _max;

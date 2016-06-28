@@ -4,8 +4,11 @@
 /// The Elements library.
 ///
 ///
-library Elements;
+library elements;
+
+export 'src/checklist_element.dart';
 export 'src/collapsible_element.dart';
 export 'src/multiselect_element.dart';
+export 'src/tag_cloud_element.dart';
 export 'src/stopwatch_element.dart';
-//export 'src/upload_image_element.dart';
+export 'src/upload_image_element.dart';
