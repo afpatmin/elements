@@ -289,6 +289,11 @@ class UploadImageElement
     }
   }
 
+  set srcB64(String value)
+  {
+    if (value != null) src = "data:image/jpg;base64," + value;
+  }
+
   set src(String value)
   {
     _thumbnail.src = value;
@@ -332,6 +337,7 @@ class UploadImageElement
     _popupContainer.style.width = window.innerWidth.toString() + "px";
     _popupContainer.style.height = window.innerHeight.toString() + "px";
     _popupContainer.style.top = _popupContainer.style.left = "0";
+    _popupContainer.style.zIndex = "99";
 
     _popupContainer.onClick.first.then((_)
     {

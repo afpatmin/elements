@@ -6,13 +6,15 @@
  */
 import 'dart:html';
 
-typedef void onChangeCallback(String value);
+typedef void callback(String value);
 
 class MultiSelectElement
 {
-  MultiSelectElement(List<String> options, {List<String> values : null, bool required : false, int max : -1, Element container : null, onChangeCallback onChange : null}) : super()
+  MultiSelectElement(List<String> options, {List<String> values : null, String label : null, bool required : false, int max : -1,
+                     Element container : null, callback onChange : null, callback on_option_click : null}) : super()
   {
     if (values != null && options.length != values.length) throw new StateError("options and values length mismatch");
+
     _required = required;
     _max = max;
     _onChange = onChange;
@@ -20,6 +22,8 @@ class MultiSelectElement
     _root.className = "row collapse multi-select";
     _selectedOptionsContainer = new DivElement();
     _selectedOptionsContainer.className = "columns multi-select-selected-container";
+
+    _onOptionClick = on_option_click;
 
     DivElement selectorCol = new DivElement();
     DivElement addButtonCol = new DivElement();
@@ -43,6 +47,17 @@ class MultiSelectElement
       }
     }
 
+    if (label != null)
+    {
+      DivElement labelCol = new DivElement();
+      labelCol.className = "columns";
+      LabelElement labelElement = new LabelElement();
+      labelElement.setInnerHtml(label);
+      labelCol.append(labelElement);
+      _root.append(labelCol);
+    }
+
+
     selectorCol.append(_options);
     addButtonCol.append(_addElement);
     _root.append(selectorCol);
@@ -59,6 +74,7 @@ class MultiSelectElement
     OptionElement option = new OptionElement();
     option.innerHtml = title;
     option.value = (value != null) ? value : title;
+
     _options.append(option);
   }
 
@@ -101,6 +117,7 @@ class MultiSelectElement
 
     /// Throws state error if no option with this value is found
     OptionElement selectedOption = _options.options.firstWhere((OptionElement opt) => opt.innerHtml == option);
+
     addedOption.dataset["value"] = selectedOption.value;
     selectedOption.remove();
     SpanElement label = new SpanElement();
@@ -113,6 +130,14 @@ class MultiSelectElement
     _selectedOptionsContainer.append(addedOption);
     _options.setCustomValidity("");
     if (_onChange != null && trigger_on_change) _onChange(value);
+    if (_onOptionClick != null)
+    {
+      label.classes.add("clickable");
+      label.onClick.listen((_)
+      {
+        _onOptionClick(addedOption.dataset["value"]);
+      });
+    }
   }
 
   void _addSelected([Event e = null])
@@ -122,6 +147,7 @@ class MultiSelectElement
     if (_options.selectedIndex < 0) return;
     DivElement addedOption = new DivElement();
     addedOption.className = "added-option no-select";
+
     addedOption.dataset["value"] = _options.selectedOptions.first.value;
     SpanElement label = new SpanElement();
     label.innerHtml = _options.selectedOptions.first.innerHtml;
@@ -137,6 +163,14 @@ class MultiSelectElement
 
     _options.setCustomValidity("");
     if (_onChange != null) _onChange(value);
+    if (_onOptionClick != null)
+    {
+      label.classes.add("clickable");
+      label.onClick.listen((_)
+      {
+        _onOptionClick(addedOption.dataset["value"]);
+      });
+    }
   }
 
   /// un-selects the option and returns it to the select list
@@ -185,6 +219,26 @@ class MultiSelectElement
     });
     if (values.length > 3) values = values.substring(0, values.length - 3);
     return values;
+  }
+
+  void showAllOptions()
+  {
+    _hiddenOptions.forEach(_options.children.add);
+    _hiddenOptions.clear();
+  }
+
+  void hideAllOptionsExcept(List<String> values)
+  {
+    showAllOptions();
+
+    if (values != null)
+    {
+      _options.options.where((option) => !values.contains(option.value)).toList(growable: true).forEach((element)
+      {
+        _hiddenOptions.add(element);
+        element.remove();
+      });
+    }
   }
 
   String nameOf(String value)
@@ -255,7 +309,7 @@ class MultiSelectElement
   get id => _options.id;
   set required(bool flag) => _required = flag;
   set id(String id) => _options.id = id;
-  set onChange(onChangeCallback callback) => _onChange = callback;
+  set onChange(callback callback) => _onChange = callback;
 
   set disabled(bool flag)
   {
@@ -268,7 +322,8 @@ class MultiSelectElement
     else _options.disabled = false;
   }
 
-  onChangeCallback _onChange;
+  callback _onChange;
+  callback _onOptionClick;
   bool _required = false;
   bool _disabled = false;
   SelectElement _options;
@@ -276,4 +331,9 @@ class MultiSelectElement
   DivElement _selectedOptionsContainer;
   DivElement _root;
   int _max;
+  //List<String> _visibleValues = new List();
+
+
+  List<OptionElement> _hiddenOptions = new List();
+
 }

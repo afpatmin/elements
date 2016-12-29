@@ -29,7 +29,7 @@ class CollapsibleElement
     _toggle = new DivElement(); //new Element.tag("i");
     _toggleIcon = new Element.tag("i");
     _toggle.className = "toggle";
-    _toggleIcon.className = "fa fa-plus icon";
+    _toggleIcon.className = "fa fa-plus icon clickable";
     _toggle.append(_toggleIcon);
 
     _title = new HeadingElement.h3();

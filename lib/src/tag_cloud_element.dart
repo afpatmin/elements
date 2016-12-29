@@ -9,7 +9,7 @@ typedef void onClickCallback();
 
 class Tag
 {
-  Tag(this._value, this._label, this._ratio, DivElement container, this._onChange)
+  Tag(this._value, this._label, this._ratio, this._uniqueSelect, String tooltip, DivElement container, this._onChange)
   {
     _root = new DivElement();
 
@@ -23,7 +23,10 @@ class Tag
 
     _root.style.userSelect = "none";
     _labelSpan.setInnerHtml(_label);
+    if (tooltip != null) _labelSpan.title = tooltip;
+
     _content.append(_labelSpan);
+
     _root.append(_content);
 
     _root.className = "tag";
@@ -33,6 +36,8 @@ class Tag
     container.append(_root);
 
     window.onResize.listen((_) => updateHeight());
+
+    updateHeight();
   }
 
   void updateHeight()
@@ -67,7 +72,8 @@ class Tag
           _icon.classes.remove("hidden");
         }
       }
-      if (_onChange != null) _onChange(_value);
+      /// If uniqueSelect is true, only trigger onchange when selected
+      if (_onChange != null && (_uniqueSelect == false || (_uniqueSelect == true && _selected == true))) _onChange(_value);
     }
   }
 
@@ -103,7 +109,10 @@ class Tag
       }
     }
 
-    if ((selected != previous) && _onChange != null) _onChange(_value);
+    if ((_selected != previous) && _onChange != null && (_uniqueSelect == false || (_uniqueSelect == true && _selected == true)))
+    {
+      _onChange(_value);
+    }
   }
   void set disabled(bool value)
   {
@@ -191,6 +200,10 @@ class Tag
     _root.className = "tag " + classname;
   }
 
+  bool get uniqueSelect => _uniqueSelect;
+
+  bool _uniqueSelect;
+
   bool _selected = false;
   bool _disabled = false;
   final String _value;
@@ -206,10 +219,20 @@ class Tag
 
 class TagCloudElement
 {
-  TagCloudElement(List<String> tag_labels, this._container, {List<String> tag_values : null, bool unique_select : false, bool required : false, double ratio : null, onTagChangeCallback onChange : null}) : super()
+  TagCloudElement(List<String> tag_labels,
+                  this._container,
+                  {
+                    List<String> tag_values : null,
+                    List<String> tooltips : null,
+                    bool unique_select : false,
+                    bool required : false,
+                    double ratio : null,
+                    onTagChangeCallback onChange : null
+                  }) : super()
   {
     if (_container == null) throw new ArgumentError.notNull("container");
-    if (tag_values != null && tag_labels.length != tag_values.length) throw new StateError("options and values length mismatch");
+    if (tag_values != null && tag_values.length != tag_labels.length) throw new StateError("options and values length mismatch");
+    if (tooltips != null && tooltips.length != tag_labels.length) throw new StateError("options and tooltips length mismatch");
 
     _container.classes.add("tag-cloud");
 
@@ -217,14 +240,15 @@ class TagCloudElement
     for (int i = 0; i < tag_labels.length; i++)
     {
       String value = (tag_values == null) ? tag_labels[i] : tag_values[i];
+      String tooltip = (tooltips == null) ? null : tooltips[i];
 
-      Tag tag = new Tag(value, tag_labels[i], ratio, _container, onChange);
+      Tag tag = new Tag(value, tag_labels[i], ratio, unique_select, tooltip, _container, onChange);
       _tags.add(tag);
     }
 
     _tags.forEach((Tag tag)
     {
-      tag.onClick = () => toggleSelected(tag, unique_select);
+      tag.onClick = () => toggleSelected(tag);
     });
 
     _required = required;
@@ -235,9 +259,9 @@ class TagCloudElement
     _tags.forEach((Tag tag) => tag.updateHeight());
   }
 
-  void toggleSelected(Tag tag, unique_select)
+  void toggleSelected(Tag tag)
   {
-    if (_disabled == false && unique_select == true) _reset();
+    if (_disabled == false && tag.uniqueSelect == true) _reset();
     tag.toggleSelected();
   }
 
