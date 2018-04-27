@@ -6,8 +6,8 @@ import 'dart:async';
 import 'dart:html';
 import 'dart:math';
 
-final double HALF_PI = 0.5 * PI;
-final double DOUBLE_PI = 2 * PI;
+final double HALF_PI = 0.5 * pi;
+final double DOUBLE_PI = 2 * pi;
 
 // An analog stopwatch
 // param int duration: timeout duration in milliseconds, must be dividable by 4

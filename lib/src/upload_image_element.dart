@@ -113,7 +113,7 @@ class UploadImageElement
       if (identifier == 225) /// 0xE1 - Exif Marker
       {
         List<int> exifIdentifier = [byteData.getUint8(byteOffset), byteData.getUint8(byteOffset+1), byteData.getUint8(byteOffset+2), byteData.getUint8(byteOffset+3)];
-        String strExifIdentifier = ASCII.decode(exifIdentifier);
+        String strExifIdentifier = ascii.decode(exifIdentifier);
         if (strExifIdentifier == "Exif")
         {
           /// "Exif\0\0"
@@ -121,8 +121,8 @@ class UploadImageElement
 
           /// TIFF HEADER
           /// Endianess
-          String strEndian = (ASCII.decode([byteData.getUint8(byteOffset), byteData.getUint8(byteOffset + 1)]));
-          Endianness endian = (strEndian == "II") ? Endianness.LITTLE_ENDIAN : Endianness.BIG_ENDIAN;
+          String strEndian = (ascii.decode([byteData.getUint8(byteOffset), byteData.getUint8(byteOffset + 1)]));
+          final endian = (strEndian == "II") ? Endian.little : Endian.big;
           byteOffset += 2;
 
           /// Next two bytes are Always 0x2a00 (or 0x002a for big endian)
