@@ -1,8 +1,11 @@
 name: elements
-version: 0.9.9
+version: 1.0.0
 author: Patrick Minogue <patrick.minogue@appfoundry.se>
 description: A library with different custom elements
 homepage: https://github.com/afpatmin/elements
-dependencies:
-  browser: '>=0.10.0+2 <0.11.0'
-  cryptoutils: ^0.2.1
+
+environment:
+  sdk: '>=2.0.0-dev.50.0 <2.0.0'
+
+dependencies:  
+  cryptoutils: ^0.3.0

@@ -88,10 +88,10 @@ class MultiSelectElement
   void cleanValues()
   {
     List<String> values = value.split(",, ");
-    List<String> validValues = new List();
+    List<String> validValues =[];
     _options.children.forEach((option)
     {
-      String found = (values.firstWhere((value) => value == option.value, orElse:() => null));
+      final found = (values.firstWhere((value) => value == (option as OptionElement).value, orElse:() => null));
       if (found != null) validValues.add(found);
     });
     options = validValues.join(",, ");
@@ -105,7 +105,7 @@ class MultiSelectElement
   Map<String, String> get pairs
   {
     Map<String, String> dataSet = new Map();
-    _options.children.forEach((OptionElement option) => dataSet[option.value] = option.innerHtml);
+    _options.children.forEach((Element option) => dataSet[(option as OptionElement).value] = option.innerHtml);
     return dataSet;
   }
 
@@ -195,7 +195,7 @@ class MultiSelectElement
   /// unSelect all options
   void _reset()
   {
-    _selectedOptionsContainer.children.forEach((DivElement addedOption)
+    _selectedOptionsContainer.children.forEach((Element addedOption)
     {
       OptionElement option = new OptionElement();
       option.innerHtml = addedOption.children.first.innerHtml;
@@ -213,7 +213,7 @@ class MultiSelectElement
   String get value
   {
     String values = "";
-    _selectedOptionsContainer.children.forEach((DivElement e)
+    _selectedOptionsContainer.children.forEach((Element e)
     {
       if (e.dataset.containsKey("value")) values += e.dataset["value"] + ",, ";
     });
