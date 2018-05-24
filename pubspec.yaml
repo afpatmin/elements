@@ -6,6 +6,3 @@ homepage: https://github.com/afpatmin/elements
 
 environment:
   sdk: '>=2.0.0-dev.50.0 <2.0.0'
-
-dependencies:  
-  cryptoutils: ^0.3.0

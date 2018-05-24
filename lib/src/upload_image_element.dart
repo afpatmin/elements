@@ -5,10 +5,10 @@
  * \brief Html box letting users upload images to the server, and displaying preview
  */
 
-import 'dart:convert';
+import 'dart:convert' as convert;
 import 'dart:html';
 import 'dart:typed_data';
-import 'package:cryptoutils/cryptoutils.dart' show CryptoUtils;
+//import 'package:cryptoutils/cryptoutils.dart' show CryptoUtils;
 
 typedef void onChangeImage();
 
@@ -113,7 +113,7 @@ class UploadImageElement
       if (identifier == 225) /// 0xE1 - Exif Marker
       {
         List<int> exifIdentifier = [byteData.getUint8(byteOffset), byteData.getUint8(byteOffset+1), byteData.getUint8(byteOffset+2), byteData.getUint8(byteOffset+3)];
-        String strExifIdentifier = ascii.decode(exifIdentifier);
+        String strExifIdentifier = convert.ascii.decode(exifIdentifier);
         if (strExifIdentifier == "Exif")
         {
           /// "Exif\0\0"
@@ -121,7 +121,7 @@ class UploadImageElement
 
           /// TIFF HEADER
           /// Endianess
-          String strEndian = (ascii.decode([byteData.getUint8(byteOffset), byteData.getUint8(byteOffset + 1)]));
+          String strEndian = (convert.ascii.decode([byteData.getUint8(byteOffset), byteData.getUint8(byteOffset + 1)]));
           final endian = (strEndian == "II") ? Endian.little : Endian.big;
           byteOffset += 2;
 
@@ -222,8 +222,8 @@ class UploadImageElement
 
         if (_thumbnail.src.contains("data:image/jpeg;base64,"))
         {
-          List<int> bytes = CryptoUtils.base64StringToBytes(_thumbnail.src.substring("data:image/jpeg;base64,".length));
-          _imageDataBase64 = CryptoUtils.bytesToBase64(bytes);
+          final bytes = convert.base64.decode(_thumbnail.src.substring("data:image/jpeg;base64,".length));
+          _imageDataBase64 = _thumbnail.src.substring("data:image/jpeg;base64,".length);
           fileByteSize = bytes.length;
         }
         else print("invalid src: ${_thumbnail.src}");
@@ -299,13 +299,13 @@ class UploadImageElement
     _thumbnail.src = value;
     if (_thumbnail.src.contains("data:image/jpeg;base64,"))
     {
-      List<int> bytes = CryptoUtils.base64StringToBytes(_thumbnail.src.substring("data:image/jpeg;base64,".length));
-      _imageDataBase64 = CryptoUtils.bytesToBase64(bytes);
+      //final bytes = convert.base64.decode(_thumbnail.src.substring("data:image/jpeg;base64,".length));
+      _imageDataBase64 = _thumbnail.src.substring("data:image/jpeg;base64,".length);
     }
     else if (_thumbnail.src.contains("data:image/jpg;base64,"))
     {
-      List<int> bytes = CryptoUtils.base64StringToBytes(_thumbnail.src.substring("data:image/jpg;base64,".length));
-      _imageDataBase64 = CryptoUtils.bytesToBase64(bytes);
+      //List<int> bytes = CryptoUtils.base64StringToBytes(_thumbnail.src.substring("data:image/jpg;base64,".length));
+      _imageDataBase64 = _thumbnail.src.substring("data:image/jpg;base64,".length);
     }
   }
 
