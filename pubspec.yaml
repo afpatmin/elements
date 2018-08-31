@@ -1,8 +1,8 @@
 name: elements
-version: 1.0.1
+version: 1.0.2
 author: Patrick Minogue <patrick.minogue@appfoundry.se>
 description: A library with different custom elements
 homepage: https://github.com/afpatmin/elements
 
 environment:
-  sdk: '>=2.0.0-dev.50.0 <2.0.0'
+  sdk: '>=2.0.0 <3.0.0'
