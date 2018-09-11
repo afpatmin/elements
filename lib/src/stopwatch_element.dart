@@ -90,19 +90,19 @@ class StopwatchElement
     if (cancel_callback = true) _callback = null;
   }
 
-  void _render(double num)
+  void _render(num dt)
   {
-    if (num != null)
+    if (dt != null)
     {
       if (_firstFrame == true)
       {
-        _animationStartTime = num;
+        _animationStartTime = dt;
         _firstFrame = false;
       }
-      _currentSeconds = num - _animationStartTime;
+      _currentSeconds = dt - _animationStartTime;
 
-      if (_ccw) _currentRadians = -HALF_PI - (num - _animationStartTime) * _radiansPerMillisecond;
-      else _currentRadians = -HALF_PI + (num - _animationStartTime) * _radiansPerMillisecond;
+      if (_ccw) _currentRadians = -HALF_PI - (dt - _animationStartTime) * _radiansPerMillisecond;
+      else _currentRadians = -HALF_PI + (dt - _animationStartTime) * _radiansPerMillisecond;
       _context.clearRect(0, 0, _dimension, _dimension);
       _context.setFillColorRgb(0, 173, 217);
       _context.setStrokeColorRgb(0, 203, 247);
